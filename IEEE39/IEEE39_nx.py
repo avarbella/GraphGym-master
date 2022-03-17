@@ -60,7 +60,7 @@ for i in range(len(T_p)):
     # data_list.append(Data(x=None, edge_index=edge_index, y = of[i,0][0][0]))
     # graph = Graph.pyg_to_graph(data_list[i])
 
-data = GraphDataset(data_list, task='graph', netlib= 'nx', minimum_node_per_graph=0)
+data = GraphDataset(data_list, task='graph', netlib='nx', minimum_node_per_graph=0)
 #torch.save(data,'C:/Users/avarbella/Documents/GraphGym-master/'
                # 'GraphGym-master/run/datasets/IEEE39.gpickle')
 nx.write_gpickle(data,'C:/Users/avarbella/Documents/GraphGym-master/'

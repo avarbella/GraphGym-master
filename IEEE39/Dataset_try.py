@@ -6,6 +6,7 @@ import scipy.io
 import numpy as np
 from scipy.sparse import csr_matrix
 from torch_geometric.loader import DataLoader
+from torch.utils.data import WeightedRandomSampler
 from deepsnap.graph import Graph
 from deepsnap.dataset import GraphDataset
 import networkx as nx
@@ -20,11 +21,11 @@ of =  scipy.io.loadmat(
 node_f = scipy.io.loadmat(
     'C:/Users/avarbella/Documents/MATLAB/test_cascades/GNN/node_f.mat')
 edge_f = scipy.io.loadmat(
-    'C:/Users/avarbella/Documents/MATLAB/test_cascades/GNN/E_f.mat')
+    'C:/Users/avarbella/Documents/MATLAB/test_cascades/GNN/E_f_over.mat')
 T_p = mat['DS_over']
 of = of['label_over']
 node_f = node_f['B_f']
-edge_f = edge_f['E_f_post']
+edge_f = edge_f['E_f_over']
 
 data_list=[]
 
@@ -65,17 +66,20 @@ for i in range(len(T_p)):
 
     if counter >= (h + 1) * 150:
         h += 1
+#sampler = WeightedRandomSampler(num_samples=len(data_list), replacement=True,)
+loader = DataLoader(data_list)
 fl_pos=InMemoryDataset.collate(data_list)
 
-torch.save(fl_pos, 'C:/Users/avarbella/Documents/GraphGym-master/GraphGym-master/run/datasets/IEEE39/IEEE39/data.pt')
+
+torch.save(fl_pos, 'C:/Users/avarbella/Documents/GraphGym-master/GraphGym-master/run/datasets/IEEE39/IEEE39/data_train.pt')
 #fl_pos=data_list.Dataset(root= 'C:/Users/avarbella/Documents/GraphGym-master/GraphGym-master/run/datasets/IEEE39/')
-#fl_pos.collate(data_list)
-loader = DataLoader(data_list)
-dp=GraphDataset.pyg_to_graphs(loader)
-torch.save(loader, 'C:/Users/avarbella/Documents/GraphGym-master/GraphGym-master/run/datasets/IEEE39/IEEE39/data1.pt')
+
+
+#dp=GraphDataset.pyg_to_graphs(loader)
+torch.save(loader, 'C:/Users/avarbella/Documents/GraphGym-master/GraphGym-master/run/datasets/IEEE39/IEEE39/data1_train.pt')
 
 
 #print(data.is_directed())
-print(D)
-# print(data.num_nodes)
+print(loader.dataset[1].x)
+#print(data.num_nodes)
 #('C:/Users/avarbella/Documents/GraphGym-master/GraphGym-master/run/datasets/IEEE39/')
