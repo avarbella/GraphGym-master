@@ -12,31 +12,29 @@ from deepsnap.dataset import GraphDataset
 import networkx as nx
 from networkx.convert_matrix import from_numpy_matrix
 from torchsampler import ImbalancedDatasetSampler
-import seaborn as sns
-import matplotlib.pyplot as plt
 import mat73
 
 # Full dataset Bus features (P,Q,U,Theta); Edge feature (Pact_in/ Rate_A)
-def get_class_distribution(dataset_obj):
-    count_dict = {k: 0 for  k,v in enumerate(np.unique([dataset_obj[i].y for i in range(0,len(dataset_obj))]))}
-
-    for i in range(len(dataset_obj)):
-        y_lbl = dataset_obj[i].y.item()
-        count_dict[y_lbl] += 1
-
-    return count_dict
+# def get_class_distribution(dataset_obj):
+#     count_dict = {k: 0 for  k,v in enumerate(np.unique([dataset_obj[i].y for i in range(0,len(dataset_obj))]))}
+#
+#     for i in range(len(dataset_obj)):
+#         y_lbl = dataset_obj[i].y.item()
+#         count_dict[y_lbl] += 1
+#
+#     return count_dict
 
 
 #Dataload
-mat = mat73.loadmat('C:/Users/avarbella/Documents/MATLAB/test_cascades/GNN/mix_3b/DS_over_tot.mat')  # load .mat file of
+mat = mat73.loadmat('C:/Users/avarbella/Documents/MATLAB/test_cascades/GNN/mix_39_118_swiss/half_dataset/DS_over_tot.mat')  # load .mat file of
 # unfiltered contigencies and trasform it into a dictionary
-of = mat73.loadmat('C:/Users/avarbella/Documents/MATLAB/test_cascades/GNN/mix_3b/label_over_tot.mat')
-node_f = mat73.loadmat('C:/Users/avarbella/Documents/MATLAB/test_cascades/GNN/mix_3b/B_f_over_tot.mat')
+of = mat73.loadmat('C:/Users/avarbella/Documents/MATLAB/test_cascades/GNN/mix_39_118_swiss/half_dataset/label_over_tot.mat')
+node_f = mat73.loadmat('C:/Users/avarbella/Documents/MATLAB/test_cascades/GNN/mix_39_118_swiss/half_dataset/B_f_over_tot.mat')
 
 #Data extract
-T_p = mat['T_p_tot']
-of = of['T_p_tot']
-node_f = node_f['T_p_tot']
+T_p = mat['y']
+of = of['y']
+node_f = node_f['y']
 data_list = []
 
 for i in range(len(T_p)):
@@ -54,8 +52,7 @@ for i in range(len(T_p)):
 
 #weighted_sampler =WeightedRandomSampler()
 loader = DataLoader(data_list, batch_size=120,shuffle=True)#WeightedRandomSampler(weights,len(data_list)))
-torch.save(loader, 'C:/Users/avarbella/Documents/GraphGym-master/GraphGym-master/run/datasets/IEEE39/IEEE39/training_dataset_mix3b.pt')
+torch.save(loader, 'C:/Users/avarbella/Documents/GraphGym-master/GraphGym-master/run/datasets/IEEE39/IEEE39/train_39_118_swiss.pt')
 print("GraphData loader object composed of {} graphs, each graph has {} nodes, {} features/node".format(len(loader),len(loader.dataset[0].x),
             len(loader.dataset[0].x[1])))
 
-plt.show()

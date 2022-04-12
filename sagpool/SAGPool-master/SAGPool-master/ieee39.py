@@ -44,9 +44,9 @@ if torch.cuda.is_available():
     args.device = 'cuda:0'
 
 dataset = torch.load('C:/Users/avarbella/Documents/GraphGym-master/'
-                     'GraphGym-master/run/datasets/IEEE39/IEEE39/training_dataset_Aw.pt')
+                     'GraphGym-master/run/datasets/IEEE39/IEEE39/train_IEEE118_swiss_small_geo.pt')
 data_test = torch.load('C:/Users/avarbella/Documents/GraphGym-master/'
-                       'GraphGym-master/run/datasets/IEEE39/IEEE39/test_dataset_Aw.pt')
+                       'GraphGym-master/run/datasets/IEEE39/IEEE39/test_IEEE118_swiss_small_geo.pt')
 
 train_dataset = dataset
 val_loader = data_test
