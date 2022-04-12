@@ -1,0 +1,16 @@
+/diffpool/logging.log
+/docs/
+/enzymes/
+/extension-cpp-master/
+/sagpool/
+/run/
+/diffpool/results/
+/diffpool/results2/
+/.ipynb_checkpoints/
+/analysis/
+/dataset/
+/install.sh
+/LICENSE
+/README.md
+/requirements.txt
+/setup.py
