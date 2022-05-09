@@ -11,7 +11,7 @@ from sklearn.metrics import f1_score, precision_score, recall_score, accuracy_sc
 run = neptune.init(
     project="annavarb/Cascades-GNN",
     api_token='eyJhcGlfYWRkcmVzcyI6Imh0dHBzOi8vYXBwLm5lcHR1bmUuYWkiLCJhcGlfdXJsIjoiaHR0cHM6Ly9hcHAubmVwdHVuZS5haSIsImFwaV9rZXkiOiIyMTY2NjYzNi1kZTFjLTQ5NzMtOTQyZi1hMzhlNjg3OTM5ODcifQ==',
-    tags='Edgeattr_all, 2hops, simple Gat conv'
+    tags='Edgeattr_all, 2hops, simple transf conv, test on uk'
 )
 
 
@@ -24,30 +24,27 @@ def is_eval_epoch(cur_epoch, eval_period, max_epoch):
     )
 
 
-eval_period = 5
-max_epoch = 100
-data_test = torch.load('C:/Users/avarbella/Documents/GraphGym-master/'
-                     'GraphGym-master/run/datasets/IEEE39/IEEE39/test.pt')
-
+eval_period = 10
+max_epoch = 200
 dataset = torch.load('C:/Users/avarbella/Documents/GraphGym-master/'
                      'GraphGym-master/run/datasets/IEEE39/IEEE39/train.pt')
+data_test = torch.load('C:/Users/avarbella/Documents/GraphGym-master/'
+                       'GraphGym-master/run/datasets/IEEE39/IEEE39/test.pt')
+data_test_swiss = torch.load('C:/Users/avarbella/Documents/GraphGym-master/'
+                             'GraphGym-master/IEEE39/uk_train.pt')
 
-
-val_loader = data_test
-train_loader = dataset
-datasets = [train_loader, val_loader]
+datasets = [dataset, data_test, data_test_swiss]
 
 
 class Net(torch.nn.Module):
     def __init__(self, in_channels, hidden_channels, out_channels):
         super().__init__()
-        n_att_heads = 3
+        n_att_heads = 4
 
-        self.conv1 = GeneralConv(in_channels, hidden_channels, in_edge_channels=4, heads=n_att_heads)
+        self.conv1 = TransformerConv(in_channels, hidden_channels, edge_dim=4, heads=n_att_heads)
         self.bn1 = torch.nn.BatchNorm1d(hidden_channels * n_att_heads)
-        compress_channels = 4
-        self.conv2 = GeneralConv(n_att_heads * hidden_channels + in_channels,
-                             n_att_heads * hidden_channels + in_channels, in_edge_channels=4)
+        self.conv2 = TransformerConv(n_att_heads * hidden_channels + in_channels,
+                             n_att_heads * hidden_channels + in_channels, edge_dim=4)
         self.bn2 = torch.nn.BatchNorm1d(n_att_heads * hidden_channels + in_channels)
         self.conv3 = GATConv(n_att_heads * hidden_channels + 2*in_channels + hidden_channels,
                              n_att_heads * hidden_channels + 2* in_channels + hidden_channels, edge_dim=4)
@@ -100,7 +97,7 @@ device = 'cuda'
 n_neurons = 16
 model = Net(3, n_neurons, n_neurons).to(device)
 optimizer = torch.optim.Adam(model.parameters(), lr=0.0001, weight_decay=9e-4)
-scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=50, gamma=0.1)
+scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=100, gamma=0.1)
 
 
 def train_epoch(logger, loader, model, optimizer):
@@ -157,10 +154,11 @@ def train(loggers, loaders, model, optimizer):
         loggers[0].write_epoch(cur_epoch)
 
         if is_eval_epoch(cur_epoch, eval_period, max_epoch):
-            for i in range(1, num_splits):
-                eval_epoch(loggers[i], loaders[i], model)
-                loggers[i].write_epoch(cur_epoch)
-
+            #for i in range(1, num_splits):
+            eval_epoch(loggers[1], loaders[1], model)
+            loggers[1].write_epoch(cur_epoch)
+    eval_epoch(loggers[2], loaders[2], model)
+    loggers[2].write_epoch(cur_epoch)
     for logger in loggers:
         logger.close()
     logging.info('Task done, results saved in {}'.format('C:/Users/avarbella/Documents/GraphGym-master/GraphGym-master/diffpool/results2/'))
